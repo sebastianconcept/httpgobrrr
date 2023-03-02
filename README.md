@@ -1,8 +1,8 @@
 # httpgobrrr
 Multi thread client to produce synthetic custom HTTP load.
 ________
-[![Release](https://img.shields.io/github/v/tag/sebastianconcept/Mapless?label=release)](https://github.com/sebastianconcept/Mapless/releases)
-
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE.txt)
+[![Release](https://img.shields.io/github/v/tag/sebastianconcept/httpgobrrr?label=release)](https://github.com/sebastianconcept/httpgobrrr/releases)
 ## Applicability
 You can use `httpgobrrr` to perform stress tests on any HTTP service.
 
@@ -14,7 +14,7 @@ You can use `httpgobrrr` to perform stress tests on any HTTP service.
 
 ## Customize the Requests
 
-In the `jobs/` directory, you can set the request that will be used to hit your target. A zero delayed simple GET /ping for example:
+In a `jobs/` directory, you can set the request that will be used to hit your target. A zero delayed simple GET /ping for example:
 
 ```JSON
 {
@@ -26,27 +26,24 @@ In the `jobs/` directory, you can set the request that will be used to hit your 
 }
 ```
 *`delay` is in milliseconds.
+
+If you want a `POST` instead of a `GET`, you can set that using `method` and adding the `payload` and `headers` properties.
+
 ## Parametrize quantity and workers
 
-The `ProduceJobs` function has the `count` constant which controls how many times you want `bearer` to process all the files under the `jobs/` directory.
+The `ProduceJobs` function has the `count` constant which controls how many times you want `httpgobrrr` to process all the files in the path you give.
 
 ```golang
-func (producer Producer) ProduceJobs() {
-	count := 1000
+func (producer Producer) ProduceJobs(quantity *int, source_path string) {
+	count := *quantity
 	for i := 0; i < count; i++ {
-		loadJobs("jobs", *producer.inbox)
+		loadJobs(source_path, *producer.inbox)
 	}
 }
 ```
 
-And the `main` function can configure the `quantityOfWorkers` constant which will define how many requests will be sending at the same time (threads with an http client each one).
+## Usage example
 
-```golang
-func main() {
-	inbox := make(chan Job, 1000)
-	const quantityOfWorkers = 100
-  ```
+     go run main.go -s jobs -c 80 -j 1000
 
-## Run
-
-    go run .
+That will search for request definitions to send in the `jobs` path using `80` concurrent threads and producing `1000` requests to be sent.
